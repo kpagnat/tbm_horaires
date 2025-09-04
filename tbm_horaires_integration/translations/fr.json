@@ -1,0 +1,32 @@
+{
+  "config": {
+    "abort": {
+      "no_stops_found": "Aucun arrêt trouvé pour cette recherche.",
+      "cannot_connect": "Impossible de contacter le service TBM.",
+      "auth_failed": "Accès refusé (clé API).",
+      "unknown": "Erreur inattendue."
+    },
+    "step": {
+      "user": {
+        "title": "Rechercher un arrêt TBM",
+        "data": {
+          "stop_query": "Arrêt"
+        }
+      },
+      "pick": {
+        "title": "Sélectionner la destination",
+        "data": {
+          "monitoring_ref": "Destination"
+        }
+      },
+      "filter": {
+        "title": "Ligne et destination",
+        "data": {
+          "line_name": "Ligne",
+          "destination_name": "Destination",
+          "title": "Nom de l'entité"
+        }
+      }
+    }
+  }
+}

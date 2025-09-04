@@ -1,0 +1,32 @@
+{
+  "config": {
+    "abort": {
+      "no_stops_found": "No stop was found for this search.",
+      "cannot_connect": "Cannot contact the TBM service.",
+      "auth_failed": "Access denied (API key).",
+      "unknown": "Unexpected error."
+    },
+    "step": {
+      "user": {
+        "title": "Search a TBM stop",
+        "data": {
+          "stop_query": "Stop search"
+        }
+      },
+      "pick": {
+        "title": "Select the platform / StopPoint",
+        "data": {
+          "monitoring_ref": "Platform / StopPoint"
+        }
+      },
+      "filter": {
+        "title": "Line and destination",
+        "data": {
+          "line_name": "Line",
+          "destination_name": "Destination",
+          "title": "Entity name"
+        }
+      }
+    }
+  }
+}
