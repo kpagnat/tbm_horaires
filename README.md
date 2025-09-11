@@ -53,7 +53,7 @@ tbm_horaires_card/tbm-horaires-card.js
 
 ### 1) Intégration (`custom_components`)
 
-1. Copier le dossier **`tbm-horaires-integration`** dans le répertoire `config/custom_components/` de votre instance.
+1. Copier le dossier **`custom_components/tbm-horaires-integration`** dans le répertoire `config/custom_components/` de votre instance.
 2. **Redémarrer Home Assistant**.
 3. Aller dans **Paramètres → Appareils & services → + Ajouter une intégration → TBM Horaires**.
 4. Étapes de configuration :
@@ -66,7 +66,7 @@ tbm_horaires_card/tbm-horaires-card.js
 
 ### 2) Carte Lovelace (fichier JS)
 
-1. Copier **`tbm-horaires-card/tbm-horaires-card.js`** dans `config/www/tbm-horaires-card`.
+1. Copier le dossier **`www/tbm-horaires-card`** dans `config/www/`.
 2. Déclarer la ressource : **Paramètres → Tableaux de bord → Ressources → Ajouter**
    - **URL** : `/local/tbm-horaires-card/tbm-horaires-card.js?v=1.0.0`
    - **Type** : *JavaScript Module*
