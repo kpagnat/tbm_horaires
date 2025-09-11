@@ -70,7 +70,7 @@ tbm_horaires_card/tbm-horaires-card.js
 2. Déclarer la ressource : **Paramètres → Tableaux de bord → Ressources → Ajouter**
    - **URL** : `/local/tbm-horaires-card/tbm-horaires-card.js?v=1.0.0`
    - **Type** : *JavaScript Module*
-3. Ajouter la carte (Carte **Manuelle**) :
+3. Ajouter la carte (Carte **Manuelle**) (avec éditeur) :
 
 ```yaml
 type: custom:tbm-horaires-card
@@ -85,6 +85,9 @@ realtime_color: '#ffffff'
 ```
 
 > **Astuce cache** : si vous modifiez le JS, incrémentez `?v=` ou forcez le rafraîchissement du navigateur.
+
+
+![Example de carte](card.png)
 
 ---
 
