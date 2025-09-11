@@ -49,22 +49,31 @@ tbm_horaires_card/tbm-horaires-card.js
 
 ---
 
-## 🚀 Installation (manuelle)
+## 🚀 Intégration
 
-### 1) Intégration (`custom_components`)
+### Installation automatique
 
-1. Copier le dossier **`custom_components/tbm-horaires-integration`** dans le répertoire `config/custom_components/` de votre instance.
-2. **Redémarrer Home Assistant**.
-3. Aller dans **Paramètres → Appareils & services → + Ajouter une intégration → TBM Horaires**.
-4. Étapes de configuration :
-   - **Rechercher un arrêt** — saisissez par ex. `La Cité du Vin`.
-   - **Choisir le quai (StopPoint)** — la liste affiche des libellés **`<Code> – <Destination>`**; s’il n’y a pas de passage imminent, un fallback `Nom [id]` peut apparaître (normal tard le soir).
-   - **Choisir Ligne et Destination** — listes déroulantes.
-   - **Nom de l’entité** proposé par défaut : `Nom arrêt – Destination`.
+- Ajouter l'adresse https://github.com/kpagnat/tbm_horaires dans les ressources HACS
+- Dans Paramètres > Appareils et services > Ajouter une intégration et chercher "TBM"
+
+### Installation manuelle
+
+- Copier le dossier **`custom_components/tbm-horaires-integration`** dans le répertoire `config/custom_components/` de votre instance.
+- **Redémarrer Home Assistant**.
+- Aller dans **Paramètres → Appareils & services → + Ajouter une intégration → TBM Horaires**.
+
+### Création d'un 1er capteur (=un arrêt+une direction)
+
+Depuis l'intégration :
+
+- **Rechercher un arrêt** — saisissez par ex. `La Cité du Vin`.
+- **Choisir le quai (StopPoint)** — la liste affiche des libellés **`<Code> – <Destination>`**; s’il n’y a pas de passage imminent, un fallback `Nom [id]` peut apparaître (normal tard le soir).
+- **Choisir Ligne et Destination** — listes déroulantes.
+- **Nom de l’entité** proposé par défaut : `Nom arrêt – Destination`.
 
 > **Nom du capteur créé** : `TBM [Ligne] [Nom arrêt] [Destination]` (friendly_name).
 
-### 2) Carte Lovelace (fichier JS)
+## Carte Lovelace (fichier JS)
 
 1. Copier le dossier **`www/tbm-horaires-card`** dans `config/www/`.
 2. Déclarer la ressource : **Paramètres → Tableaux de bord → Ressources → Ajouter**
@@ -85,7 +94,6 @@ realtime_color: '#ffffff'
 ```
 
 > **Astuce cache** : si vous modifiez le JS, incrémentez `?v=` ou forcez le rafraîchissement du navigateur.
-
 
 ![Example de carte](card.png)
 
