@@ -7,23 +7,21 @@
       "unknown": "Unexpected error."
     },
     "step": {
-      "user": {
-        "title": "Search a TBM stop",
+      "select_stop": {
+        "title": "Selecting TBM line",
         "data": {
-          "stop_query": "Stop search"
+          "select_line": "Select line"
         }
       },
-      "pick": {
-        "title": "Select the platform / StopPoint",
+      "user_validate": {
+        "title": "Selecting stop",
         "data": {
-          "monitoring_ref": "Platform / StopPoint"
+          "select_stop": "Stop"
         }
       },
-      "filter": {
-        "title": "Line and destination",
+      "create_entity": {
+        "title": "Entity creation",
         "data": {
-          "line_name": "Line",
-          "destination_name": "Destination",
           "title": "Entity name"
         }
       }

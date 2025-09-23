@@ -127,7 +127,7 @@
         <div class="card-config" style="display:grid;gap:12px;padding:12px">
           <ha-entity-picker id="entity" label="Entité (sensor)" .includeDomains='["sensor"]'></ha-entity-picker>
 
-          <ha-textfield id="count" label="Nombre de passages (max 3)" type="number" min="1" max="6"></ha-textfield>
+          <ha-textfield id="count" label="Nombre de passages (max 3)" type="number" min="1" max="3"></ha-textfield>
 
           <ha-textfield id="realtime_icon" label="Icône temps réel (ex: mdi:wifi)"></ha-textfield>
 

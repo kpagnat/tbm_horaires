@@ -10,11 +10,15 @@ import httpx
 LOGGER = logging.getLogger(__name__)
 
 class TBMCoordinator(DataUpdateCoordinator):
-    def __init__(self, hass: HomeAssistant, name: str,
-                 monitoring_ref: str, line_ref: str | None,
-                 destination_ref: str | None, preview: str):
+    def __init__(self, 
+            hass: HomeAssistant, 
+            name: str,
+            stop_point_ref: str,
+            line_ref: str | None,
+            destination_ref: str | None,
+            preview: str):
         self.hass = hass
-        self.monitoring_ref = monitoring_ref
+        self.stop_point_ref = stop_point_ref
         self.line_ref = line_ref
         self.destination_ref = destination_ref
         self.preview = preview
@@ -29,7 +33,7 @@ class TBMCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         return await self.client.stop_monitoring(
-            self.monitoring_ref, self.line_ref, self.destination_ref, self.preview, max_visits=10
+            self.stop_point_ref, self.line_ref, self.destination_ref, self.preview, max_visits=10
         )
 
     async def async_shutdown(self):

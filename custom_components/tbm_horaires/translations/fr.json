@@ -7,23 +7,21 @@
       "unknown": "Erreur inattendue."
     },
     "step": {
-      "user": {
-        "title": "Rechercher un arrêt TBM",
+      "select_stop": {
+        "title": "Sélection de la ligne TBM",
         "data": {
-          "stop_query": "Arrêt"
+          "select_line": "Sélectionner une ligne"
         }
       },
-      "pick": {
-        "title": "Sélectionner la destination",
+      "user_validate": {
+        "title": "Sélection de l'arrêt",
         "data": {
-          "monitoring_ref": "Destination"
+          "select_stop": "Arrêt"
         }
       },
-      "filter": {
-        "title": "Ligne et destination",
+      "create_entity": {
+        "title": "Création de l'entité",
         "data": {
-          "line_name": "Ligne",
-          "destination_name": "Destination",
           "title": "Nom de l'entité"
         }
       }

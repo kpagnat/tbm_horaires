@@ -3,10 +3,17 @@ import httpx
 import unicodedata
 from typing import Any, Dict, List, Tuple
 
-def _norm(s: str) -> str:
-    return unicodedata.normalize("NFKD", s or "").casefold()
+import logging
+_LOGGER = logging.getLogger(__name__)
+logging.basicConfig(level="DEBUG")
 
-def _text(v):
+def to_int(value, default: int = -1) -> int:
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return default
+
+def get_value(v: Any) -> str:
     """Retourne le texte depuis un champ SIRI qui peut être list/dict/str."""
     if isinstance(v, list):
         if not v:
@@ -23,37 +30,13 @@ def _text(v):
         return v
     return ""
 
-def _get_ref(obj: Any) -> str:
-    if isinstance(obj, dict):
-        v = obj.get("value")
-        return v if isinstance(v, str) else ""
-    return obj if isinstance(obj, str) else ""
-
-def _get_name(sn: Any) -> str:
-    # "StopName": [{"value":"...","lang":"fr"}] ou dict {"value":"..."} ou string
-    if isinstance(sn, list) and sn:
-        x = sn[0]
-        if isinstance(x, dict):
-            return x.get("value") or ""
-        if isinstance(x, str):
-            return x
-    if isinstance(sn, dict):
-        return sn.get("value") or ""
-    if isinstance(sn, str):
-        return sn
-    return ""
-
 class SiriLiteClient:
     def __init__(self, session: httpx.AsyncClient, api_base: str, api_key: str):
         self._s = session
         self._base = api_base
         self._key = api_key
 
-    async def lines_map(self) -> Dict[str, Dict[str, str]]:
-        """
-        Mappe LineRef -> {"published": "...", "name": "...", "mode": "..."} via lines-discovery.
-        On stocke aussi la clé 'last' (dernier token après ':') pour faciliter le matching.
-        """
+    async def get_lines(self) -> Dict[str, Dict[str, str]]:
         url = f"{self._base}/lines-discovery.json"
         r = await self._s.get(url, params={"AccountKey": self._key}, headers={"Accept":"application/json"}, timeout=20)
         r.raise_for_status()
@@ -61,25 +44,26 @@ class SiriLiteClient:
         items = (data.get("Siri", {})
                 .get("LinesDelivery", {})
                 .get("AnnotatedLineRef", []))
-        m: Dict[str, Dict[str, str]] = {}
+        found_lines: Dict[str, Dict[str, str]] = {}
         for it in items or []:
-            ref = _text(it.get("LineRef"))
-            pub = _text(it.get("PublishedLineName")) or _text(it.get("LineName"))
-            mode = _text(it.get("TransportMode")) or _text(it.get("ProductCategoryRef"))
-            name = _text(it.get("LineName")) or pub
-            if ref:
-                m[ref] = {"published": pub, "name": name, "mode": mode, "last": ref.split(":")[-1]}
-        # index supplémentaires par dernier token pour rattraper certains refs
-        for ref, v in list(m.items()):
-            last = v["last"]
-            if last and last not in m:
-                m[last] = v
-            alias = f"line:{last}"
-            if alias not in m:
-                m[alias] = v
-        return m
+            line_ref = get_value(it.get("LineRef"))
+            line_name = get_value(it.get("LineName"))
 
-    async def stoppoints_search(self, query: str, bbox: Tuple[float,float,float,float]) -> List[Dict[str, Any]]:
+            if line_ref:
+                line_code = get_value(it.get("LineCode"))
+                destinations = it.get("Destinations")
+                for d in (destinations or []):
+                    direction_ref = to_int(get_value(d.get("DirectionRef")))
+                    place_name = get_value(d.get("PlaceName"))
+                    key = f"{line_ref}-{direction_ref}"
+
+                    found_lines[key] = {"LineRef": line_ref, "LineName": line_name, "LineCode": line_code, "Direction": place_name, "DirectionRef": direction_ref}
+
+        # Tri sur LineName
+        found_lines_sorted = dict(sorted(found_lines.items(), key=lambda kv: (kv[1].get("LineName") or "")))
+        return found_lines_sorted
+
+    async def stoppoints_search(self, target_line_ref: str, direction_ref:int, bbox: Tuple[float,float,float,float]) -> List[Dict[str, Any]]:
         W, N, E, S = bbox
         url = f"{self._base}/stoppoints-discovery.json"
         params = {
@@ -96,34 +80,46 @@ class SiriLiteClient:
                    .get("StopPointsDelivery", {})
                    .get("AnnotatedStopPointRef", []))
 
-        qn = _norm(query)
         results = []
+
         for it in items:
-            name = _get_name(it.get("StopName"))
-            ref = _get_ref(it.get("StopPointRef"))
-            if name and ref and qn in _norm(name):
-                results.append({"name": name, "ref": ref})
+            stop_name = get_value(it.get("StopName"))
+            stop_point_ref = get_value(it.get("StopPointRef"))
+            stop_area_ref = get_value(it.get("StopAreaRef"))
+            lines = it.get("Lines")
+
+            for l in (lines or []):
+                line_ref = get_value(l)
+                # Ligne trouvée ! Il faut regarder si on est dans la bonne direction grâce au StopPointRef
+                if target_line_ref == line_ref:
+                    stop_monitor = await self.stop_monitoring(stop_point_ref, target_line_ref, direction_ref, max_visits=1)
+                    if len(stop_monitor) > 0:
+                        results.append({"StopName": stop_name, "StopPointRef": stop_point_ref, "StopAreaRef": stop_area_ref, "DirectionRef": direction_ref})
+                    break
+
+        # Tri sur StopName
+        results.sort(key=lambda x: (x.get("StopName") or "").casefold())
         return results
     
     async def stop_monitoring(
         self,
-        monitoring_ref: str,
+        stop_point_ref: str,
         line_ref: str | None = None,
-        destination_ref: str | None = None,
+        direction_ref: int = -1,
         preview: str = "PT40M",
-        max_visits: int = 8
+        max_visits: int = 4
     ) -> List[Dict[str, Any]]:
         url = f"{self._base}/stop-monitoring.json"
         params: Dict[str, Any] = {
             "AccountKey": self._key,
-            "MonitoringRef": monitoring_ref,
+            "MonitoringRef": stop_point_ref,
             "PreviewInterval": preview,
             "MaximumStopVisits": max_visits
         }
         if line_ref:
             params["LineRef"] = line_ref
-        if destination_ref:
-            params["DestinationRef"] = destination_ref
+        if direction_ref != -1:
+            params["DirectionRef"] = direction_ref
 
         r = await self._s.get(url, params=params, headers={"Accept":"application/json"}, timeout=20)
         r.raise_for_status()
@@ -136,28 +132,28 @@ class SiriLiteClient:
         visits: List[Dict[str, Any]] = []
         for d in deliveries:
             for v in (d.get("MonitoredStopVisit") or []):
+                
+                stop_point_ref = get_value(v.get("MonitoringRef"))
                 mvj = v.get("MonitoredVehicleJourney") or {}
 
                 # Récupération brute
-                line_ref_val = _text(mvj.get("LineRef"))
-                line_name = _text(mvj.get("PublishedLineName")) or _text(mvj.get("LineName"))
+                line_ref_val = get_value(mvj.get("LineRef"))
+                direction_ref = to_int(get_value(mvj.get("DirectionRef")))
                 call = mvj.get("MonitoredCall") or {}
-                destination = (_text(mvj.get("DestinationName")) or
-                            _text(call.get("DestinationDisplay")) or
-                            _text(mvj.get("DirectionName")) or
-                            _text(mvj.get("DestinationRef")))
+                destination = (get_value(mvj.get("DestinationName")) or get_value(mvj.get("DirectionName")))
 
                 aimed = call.get("AimedDepartureTime") or call.get("AimedArrivalTime")
                 expected = call.get("ExpectedDepartureTime") or call.get("ExpectedArrivalTime")
                 realtime = bool(expected and aimed and expected != aimed)
 
                 visits.append({
-                    "line_name": line_name or "",        # peut être vide → on compensera avec lines_map côté flow
-                    "line_ref": line_ref_val or "",
-                    "destination": destination or "",
-                    "aimed": aimed,
-                    "expected": expected,
-                    "realtime": realtime
+                    "StopPointRef": stop_point_ref,
+                    "DirectionRef": direction_ref,
+                    "LineRef": line_ref_val or "",
+                    "destination": destination or "",      # <- lower
+                    "aimed": aimed,                        # <- lower
+                    "expected": expected,                  # <- lower
+                    "realtime": realtime                   # <- lower
                 })
 
         visits.sort(key=lambda x: x["expected"] or x["aimed"] or "")

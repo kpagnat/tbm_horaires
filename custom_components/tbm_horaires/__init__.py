@@ -13,7 +13,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     coord = TBMCoordinator(
         hass,
         name=f"TBM {entry.data['stop_label']} -> {entry.data['dest_label']}",
-        monitoring_ref=entry.data["monitoring_ref"],
+        stop_point_ref=entry.data["stop_point_ref"],
         line_ref=entry.data["line_ref"],
         destination_ref=entry.data["destination_ref"],
         preview=entry.data["preview"]
