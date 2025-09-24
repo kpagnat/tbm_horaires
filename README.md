@@ -4,13 +4,11 @@ Affiche les **prochains passages** (temps réel) des lignes TBM (tram / bus / ba
 
 ---
 
-## ✨ Fonctionnalités
+## ✨ Fonctionnement
 
-- Recherche de la **ligne** par nom (Liane 1, EXPRESS G, etc.)
-- Sélection de **l'arrêt+destination** avec libellé **`<Code de ligne> – <Destination>`** (ex. `B – France Alouette`, `27 – Bordeaux Ravezies`).
-- **Temps réel** détecté
-- Rafraîchissement périodique (par défaut **toutes les minutes**, configurable).
-- Carte Lovelace dédiée
+- Sélection de **ligne** + **destination** (ex. `Liane 1 - PESSAC CAP DE BOS, etc.`)
+- Sélection de **l'arrêt** (ex. `Barrière de Pessac`).
+- Validation de l'entité
 
 ---
 
@@ -20,7 +18,7 @@ Affiche les **prochains passages** (temps réel) des lignes TBM (tram / bus / ba
 custom_components\tbm_horaires\*.*
 ```
 
-## 🖼️ Carte Lovelace (frontend)
+## 🖼️ Carte Lovelace
 
 ```text
 www\tbm_horaires_card\tbm-horaires-card.js
@@ -52,7 +50,7 @@ www\tbm_horaires_card\tbm-horaires-card.js
 
 Depuis l'intégration :
 
-- **Sélectionner une ligne** — ex. `Liane 1`.
+- **Sélectionner une ligne**
 - **Choisir l'arrêt**
 - **Valider l’entité**
 
@@ -62,7 +60,7 @@ Depuis l'intégration :
 
 1. Copier le dossier **`www/tbm-horaires-card`** dans `config/www/`.
 2. Déclarer la ressource : **Paramètres → Tableaux de bord → Ressources → Ajouter**
-   - **URL** : `/local/tbm-horaires-card/tbm-horaires-card.js?v=1.0.0`
+   - **URL** : `/local/tbm-horaires-card/tbm-horaires-card.js`
    - **Type** : *JavaScript Module*
 3. Ajouter la carte (Carte **Manuelle**) (avec éditeur) :
 
