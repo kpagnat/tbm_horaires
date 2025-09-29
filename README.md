@@ -17,7 +17,7 @@ Affiche les **prochains passages** (temps réel) des lignes TBM (tram / bus / ba
 
 ### Installation automatique
 
-[![Ouvre votre instance Home Assistant et ajoute un dépôt dans la boutique communautaire Home Assistant.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kpagnat&repository=tbm-horaires&category=integration)
+[![Ouvre votre instance Home Assistant et ajoute un dépôt dans la boutique communautaire Home Assistant.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kpagnat&repository=tbm_horaires&category=integration)
 
 ### Installation manuelle
 
